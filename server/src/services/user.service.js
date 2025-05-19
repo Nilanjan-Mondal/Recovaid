@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const userRepo = require("../repositories/user.repository");
 
 async function registerUser(userDetails) {
