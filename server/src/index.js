@@ -3,6 +3,8 @@ const cors = require('cors');
 const serverConfig = require('./configs/serverConfig');
 const connectDB = require('./configs/dbConfig');
 
+const userRoutes = require("./routes/user.routes");
+
 
 const app = express();
 
@@ -22,6 +24,8 @@ app.get('/', (req, res) => {
         message: "Welcome to Recovaid..."
     })
 })
+
+app.use("/api/users", userRoutes);
 
 //server starts here
 app.listen(serverConfig.PORT, async () => {
