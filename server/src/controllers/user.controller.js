@@ -20,6 +20,27 @@ async function createUser(req, res) {
   }
 }
 
+
+async function getAllDoctors(req, res) {
+    try {
+      const doctors = await userService.fetchDoctors();
+      return res.status(200).json({
+        message: "Doctors fetched successfully",
+        success: true,
+        data: doctors,
+        error: {}
+      });
+    } catch (error) {
+      console.error("Error in getAllDoctors:", error);
+      return res.status(500).json({
+        message: "Failed to fetch doctors",
+        success: false,
+        data: [],
+        error
+      });
+    }
+  }
+
 module.exports = {
-  createUser
+  createUser, getAllDoctors
 };

@@ -73,6 +73,12 @@ async function registerUser(userDetails) {
   return newUser;
 }
 
+
+async function fetchDoctors() {
+  const doctors = await userRepo.findUsersByRole("doctor");
+  return doctors;
+}
+
 module.exports = {
-  registerUser
+  registerUser, fetchDoctors
 };

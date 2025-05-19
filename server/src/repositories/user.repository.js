@@ -8,6 +8,11 @@ async function createUser(userDetails) {
   return await User.create(userDetails);
 }
 
+async function findUsersByRole(role) {
+    return await User.find({ role }).select("name _id phone specialization");
+}
+  
+
 async function findUserById(id) {
   return await User.findById(id);
 }
@@ -15,5 +20,6 @@ async function findUserById(id) {
 module.exports = {
   findUser,
   createUser,
+  findUsersByRole,
   findUserById
 };
