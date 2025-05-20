@@ -1,29 +1,69 @@
 const { createStatusEntry, getStatusesByPatient, getStatusesByDoctor } = require("../repositories/dailyStatus.Repository");
-//const { sendCriticalAlertEmail } = require("../utils/emailUtils"); // Optional, if implemented
-
-// Dummy AI logic for now
-function calculateCriticality(symptoms, temperature) {
-    let score = 0;
-    if (temperature > 101) score += 5;
-    if (symptoms?.toLowerCase().includes("pus")) score += 5;
-    if (symptoms?.toLowerCase().includes("pain") || symptoms?.toLowerCase().includes("redness")) score += 3;
-    return score;
-}
-
-function generateAISummary(symptoms, temperature) {
-    return `Patient reported ${symptoms}, Temperature: ${temperature}°F. Evaluation required.`;
-}
+const { generateImgContent, generateStrContent } = require("./aiReview.service");
 
 async function createDailyStatusService(patientId, body) {
     const {
         doctorId, 
         symptoms,
         temperature,
-        imageUrls
+        imageUrl
     } = body;
 
-    const criticalityScore = calculateCriticality(symptoms, temperature);
-    const aiSummary = generateAISummary(symptoms, temperature);
+    let imgReviewText = "";
+    let strReviewText = "";
+    let imgScore = 0;
+    let strScore = 0;
+
+    try {
+        // Prompt for text-based symptoms
+        const textPrompt = `
+            Symptoms: ${symptoms || "None provided"}
+            Temperature: ${temperature || "N/A"}°F
+        `;
+
+        // Run AI reviews in parallel
+        const [imgResult, strResult] = await Promise.all([
+            imageUrl ? generateImgContent(imageUrl) : Promise.resolve(""),
+            generateStrContent(textPrompt)
+        ]);
+
+        // --- Extract and clean AI results ---
+
+        // Helper function to extract score and reason
+        const extractScoreAndReason = (text) => {
+            const scoreMatch = text.match(/Severity Score:\s*(\d+)/i);
+            const reasonMatch = text.match(/Reason:\s*(.*)/i);
+            const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
+            const reason = reasonMatch ? reasonMatch[1].replace(/\n/g, "").trim() : "No reason provided";
+            return { score, reason };
+        };
+
+        // Text AI
+        const strData = extractScoreAndReason(strResult);
+        strScore = strData.score;
+        strReviewText = strData.reason;
+
+        // Image AI (if present)
+        if (imageUrl) {
+            const imgData = extractScoreAndReason(imgResult);
+            imgScore = imgData.score;
+            imgReviewText = imgData.reason;
+        }
+
+    } catch (error) {
+        console.error("AI evaluation failed:", error);
+        imgReviewText = "Image analysis failed";
+        strReviewText = "Text analysis failed";
+    }
+
+    // Final criticality score (average if image exists, else use text score only)
+    const criticalityScore = imageUrl ? ((strScore + imgScore) / 2) : strScore;
+
+    // Final combined AI summary
+    const aiSummaryParts = [];
+    if (imgReviewText && imageUrl) aiSummaryParts.push(`Image Analysis: ${imgReviewText}`);
+    if (strReviewText) aiSummaryParts.push(`Patient Description: ${strReviewText}`);
+    const aiSummary = aiSummaryParts.join(" ");
 
     const alertSent = criticalityScore >= 8;
 
@@ -32,16 +72,14 @@ async function createDailyStatusService(patientId, body) {
         doctor: doctorId,
         symptoms,
         temperature,
-        imageUrls,
+        imageUrl,
         aiSummary,
         criticalityScore,
         alertSent
     });
 
-    if (alertSent) {
-        // Optional: Send email to doctor
-        // await sendCriticalAlertEmail(doctorId, aiSummary);
-    }
+    // Optional: alert system if implemented
+    // if (alertSent) await sendCriticalAlertEmail(doctorId, aiSummary);
 
     return newStatus;
 }
