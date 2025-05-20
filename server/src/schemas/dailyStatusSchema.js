@@ -14,7 +14,6 @@ const dailyStatusSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   symptoms: { type: String },
   temperature: { type: Number },
-  imageUrls: { type: String },
   aiSummary: { type: String },
   criticalityScore: { type: Number, default: 0 },
   doctorResponse: { type: String },
