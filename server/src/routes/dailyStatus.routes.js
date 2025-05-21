@@ -8,7 +8,7 @@ const {
 } = require('../controllers/dailyStatus.controller');
 
 // Patient submits daily update
-router.post('/', isLoggedIn, createDailyStatus);
+router.post('/', isLoggedIn, isPatient, createDailyStatus);
 
 // Patient views their records
 router.get('/me', isLoggedIn, isPatient, getMyStatuses);
