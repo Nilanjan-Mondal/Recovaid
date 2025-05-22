@@ -1,4 +1,6 @@
 const { createStatusEntry, getStatusesByPatient, getStatusesByDoctor } = require("../repositories/dailyStatus.Repository");
+const { findUserById } = require("../repositories/user.repository");
+const { sendCriticalAlertEmail } = require("../utils/nodeMailer");
 const { generateImgContent, generateStrContent } = require("./aiReview.service");
 
 async function createDailyStatusService(patientId, body) {
@@ -78,8 +80,22 @@ async function createDailyStatusService(patientId, body) {
         alertSent
     });
 
-    // Optional: alert system if implemented
-    // if (alertSent) await sendCriticalAlertEmail(doctorId, aiSummary);
+    if(alertSent) {
+        try {
+            const doctor = await findUserById(doctorId);
+            const patient = await findUserById(patientId);
+            const doctorEmail = doctor?.email;
+            const patientName = patient?.name;
+            console.log("Doctor email:", doctorEmail);
+            console.log("Patient name:", patientName);
+            console.log("AI Summary:", aiSummary);
+            if(doctorEmail) {
+                await sendCriticalAlertEmail(doctorEmail, patientName, aiSummary);
+            }
+        } catch (error) {
+            console.error("Failed to send alert email:", error);
+        }
+    }
 
     return newStatus;
 }
