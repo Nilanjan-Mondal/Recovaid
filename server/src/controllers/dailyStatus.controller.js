@@ -6,7 +6,6 @@ const {
 
 async function createDailyStatus(req, res) {
     try {
-        console.log("createDailyStatus request body:", req.body);
         const patientId = req.user.id;
         const data = await createDailyStatusService(patientId, req.body);
         return res.status(201).json({
