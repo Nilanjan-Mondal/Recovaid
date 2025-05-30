@@ -11,8 +11,8 @@ A **fullstack health monitoring web app** for post-surgical recovery, enabling r
 
 ---
 
->  *Currently in development: Backend (Node.js + Express + MongoDB)*  
->  *Frontend (React) coming soon*
+>  *Backend (Node.js + Express + MongoDB)*  
+>  *Currently in development: Frontend (React)*
 
 ---
 
@@ -46,12 +46,12 @@ This system connects **patients** and **doctors** to manage post-surgical recove
 
 | Layer      | Tech Used |
 |------------|-----------|
-|Frontend (Planned)|![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61DAFB)|
+|Frontend (Ongoing)|![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61DAFB)|
 |Backend|![Node.js](https://img.shields.io/badge/Node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)|
 |Database|![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white) ![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logoColor=white)|
 |Authentication |![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)|
-|Email Service (Planned)|![Nodemailer](https://img.shields.io/badge/Nodemailer-EA4335?style=for-the-badge&logo=maildotru&logoColor=white)|
-|AI Logic (Planned)|![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)|
+|Email Service |![Nodemailer](https://img.shields.io/badge/Nodemailer-EA4335?style=for-the-badge&logo=maildotru&logoColor=white)|
+|AI Logic |![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)|
 
 </div>
 
