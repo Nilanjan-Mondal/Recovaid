@@ -1,11 +1,57 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import Home from './pages/Home'
 import Navbar from './components/Navbar'
 import Auth from './components/Auth'
+import { BaseUrl } from './configs/ClientConfig'
 
 function App() {
   const [authOpen, setAuthOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const res = await fetch(`${BaseUrl}/ping`, {
+          method: 'GET',
+          credentials: 'include',
+        })
+        if (res.ok) {
+          setIsLoggedIn(true)
+        } else {
+          setIsLoggedIn(false)
+        }
+      } catch (err) {
+        console.error('Login check failed', err)
+        setIsLoggedIn(false)
+      }
+    }
+
+    checkLogin()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch(`${BaseUrl}/api/auth/logout`, {
+        method: 'GET',
+        credentials: 'include', // sends cookies
+      });
+
+      if (res.ok) {
+        setIsLoggedIn(false);
+        navigate('/'); // go to home or login
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (err) {
+      console.error('Error during logout:', err);
+    }
+  };
+
+  const handleGoToDashboard = () => {
+    // Navigate or scroll to the dashboard section.
+    console.log("Navigating to dashboard...");
+  };
 
   return (
     <>
@@ -27,10 +73,21 @@ function App() {
         everytime the state is changed react re-renders the app component completely thereby achieving the desired effect of showing and hiding the Auth component.
       */}
 
+      <Navbar
+        onRegisterClick={() => setAuthOpen(true)}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
+        onDashboard={handleGoToDashboard}
+      />
 
-      <Navbar onRegisterClick={() => setAuthOpen(true)} />
-      {authOpen && (<Auth onClose={() => setAuthOpen(false)} />)}
-      <Home onRegisterClick={() => setAuthOpen(true)}/>
+      {authOpen && (<Auth onClose={() => setAuthOpen(false)} onLogin={() => setIsLoggedIn(true)} />)}
+
+      <Home
+        onRegisterClick={() => setAuthOpen(true)}
+        isLoggedIn={isLoggedIn}
+        onDashboard={handleGoToDashboard}
+      />
+
     </>
   )
 }
