@@ -8,6 +8,7 @@ const userRoutes = require("./routes/user.routes");
 const authRoutes = require("./routes/auth.routes");
 const dailyStatusRoutes = require("./routes/dailyStatus.routes");
 const respondToStatusRoutes = require("./routes/respondToStatus.routes");
+const { isLoggedIn } = require('./validations/authValidator');
 
 
 const app = express();
@@ -28,6 +29,13 @@ app.get('/', (req, res) => {
     return res.json({
         message: "Welcome to Recovaid..."
     })
+})
+
+app.get('/ping', isLoggedIn, (req, res) => {
+    // controller
+    console.log(req.body);
+    console.log(req.cookies);
+    return res.json({message: "pong"});
 })
 
 app.use("/api/users", userRoutes);
