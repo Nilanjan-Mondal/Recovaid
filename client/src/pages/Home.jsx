@@ -1,7 +1,7 @@
 import CountUp from 'react-countup';
 import heroImg from '../assets/heroImg.png';
 
-export default function Home({ onRegisterClick }) {
+export default function Home({ onRegisterClick, isLoggedIn, onDashboard }) {
     return (
         <div className="bg-gradient-to-b from-[#0f0f0f] via-[#1a1a1a] to-[#101a17]">
             {/* Hero Section */}
@@ -53,11 +53,21 @@ export default function Home({ onRegisterClick }) {
 
                         {/* Buttons */}
                         <div className="pt-10 flex flex-wrap justify-center sm:justify-start gap-4">
-                            <button className="bg-gradient-to-r from-[#00C896] to-[#00A582] text-black font-semibold px-6 py-3 rounded-[10px] shadow-2xl shadow-[#00C896]/30 hover:from-[#00b287] hover:to-[#009c75] transition-all duration-300"
+                            {!isLoggedIn ? (
+                                <button
+                                className="bg-gradient-to-r from-[#00C896] to-[#00A582] text-black font-semibold px-6 py-3 rounded-[10px] shadow-2xl shadow-[#00C896]/30 hover:from-[#00b287] hover:to-[#009c75] transition-all duration-300"
                                 onClick={onRegisterClick}
-                            >
+                                >
                                 Explore Now
-                            </button>
+                                </button>
+                            ) : (
+                                <button
+                                className="bg-gradient-to-r from-[#00C896] to-[#00A582] text-black font-semibold px-6 py-3 rounded-[10px] shadow-2xl shadow-[#00C896]/30 hover:from-[#00b287] hover:to-[#009c75] transition-all duration-300"
+                                onClick={onDashboard}
+                                >
+                                View Dashboard
+                                </button>
+                            )}
                             <button className="bg-gradient-to-r from-[#00C896] to-[#00A582] text-black font-semibold px-6 py-3 rounded-[10px] shadow-2xl shadow-[#00C896]/30 hover:from-[#00b287] hover:to-[#009c75] transition-all duration-300">
                                 Contact Us
                             </button>
