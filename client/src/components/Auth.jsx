@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import axios from 'axios';
 import { BaseUrl } from '../configs/ClientConfig';
 
-export default function Auth({ onClose }) {
+export default function Auth({ onClose, onLogin }) {
   const [role, setRole] = useState('patient');
   const [isLogin, setIsLogin] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,6 +58,7 @@ export default function Auth({ onClose }) {
       console.log("Response:", response.data);
       alert('Success!');
       onClose(); // close modal
+      onLogin(); // notify parent component about successful login
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
       alert(error.response?.data?.message || error.message);
