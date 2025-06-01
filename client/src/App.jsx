@@ -1,78 +1,86 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import Home from './pages/Home'
-import Navbar from './components/Navbar'
-import Auth from './components/Auth'
-import { BaseUrl } from './configs/ClientConfig'
+import { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+import "./App.css";
+import Home from "./pages/Home";
+import Navbar from "./components/Navbar";
+import Auth from "./components/Auth";
+import { BaseUrl } from "./configs/ClientConfig";
+import PatientDashboard from "./pages/PatientDashboard";
+import DoctorDashboard from "./pages/DoctorDashboard";
+import Footer from "./components/Footer";
+import AboutUs from "./pages/AboutUs";
 
 function App() {
+  return (
+    <Router>
+      {/* Wrapping the main app in Router becuase useNavigate is only possible in a routed component (if we use useNavigate inside normal function App() it will give error) */}
+      <MainApp />
+    </Router>
+  );
+}
+
+function MainApp() {
   const [authOpen, setAuthOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkLogin = async () => {
       try {
         const res = await fetch(`${BaseUrl}/ping`, {
-          method: 'GET',
-          credentials: 'include',
-        })
-        if (res.ok) {
-          setIsLoggedIn(true)
-        } else {
-          setIsLoggedIn(false)
-        }
-      } catch (err) {
-        console.error('Login check failed', err)
-        setIsLoggedIn(false)
+          method: "GET",
+          credentials: "include",
+        });
+        setIsLoggedIn(res.ok);
+      } catch {
+        setIsLoggedIn(false);
       }
-    }
-
-    checkLogin()
-  }, [])
+    };
+    checkLogin();
+  }, []);
 
   const handleLogout = async () => {
     try {
       const res = await fetch(`${BaseUrl}/api/auth/logout`, {
-        method: 'GET',
-        credentials: 'include', // sends cookies
+        method: "GET",
+        credentials: "include",
       });
-
       if (res.ok) {
         setIsLoggedIn(false);
-        navigate('/'); // go to home or login
-      } else {
-        console.error('Logout failed');
+        navigate("/");
       }
     } catch (err) {
-      console.error('Error during logout:', err);
+      console.error("Logout failed:", err);
+    }
+  };
+
+  const handleLogin = async (role) => {
+    setIsLoggedIn(true);
+    setRole(role);
+    if (role === "doctor") {
+      navigate("/doctorDashboard");
+    } else if (role === "patient") {
+      navigate("/patientDashboard");
     }
   };
 
   const handleGoToDashboard = () => {
-    // Navigate or scroll to the dashboard section.
-    console.log("Navigating to dashboard...");
+    if (role === "doctor") {
+      navigate("/doctorDashboard");
+    } else if (role === "patient") {
+      navigate("/patientDashboard");
+    }
   };
 
   return (
     <>
-
-      {/* 
-        React Component Data Flow ->
-        Data (props) flows from Parent → Child
-        Always one-way: top-down (parent to child)
-
-        A parent sends data to a child using props.
-
-        The child cannot directly modify the parent’s state — it can only ask the parent to do something (e.g., by calling a function passed as a prop). 
-        
-        Here App.jsx is the parent component and Navbar is the child component.
-        The Navbar component receives the onRegisterClick function as a prop, which it can call when the "Register Now" button is clicked.
-        
-        Auth component is conditionally rendered based on the authOpen state, which is controlled by the App component.
-
-        everytime the state is changed react re-renders the app component completely thereby achieving the desired effect of showing and hiding the Auth component.
-      */}
-
       <Navbar
         onRegisterClick={() => setAuthOpen(true)}
         isLoggedIn={isLoggedIn}
@@ -80,16 +88,29 @@ function App() {
         onDashboard={handleGoToDashboard}
       />
 
-      {authOpen && (<Auth onClose={() => setAuthOpen(false)} onLogin={() => setIsLoggedIn(true)} />)}
+      {authOpen && (
+        <Auth onClose={() => setAuthOpen(false)} onLogin={handleLogin} />
+      )}
 
-      <Home
-        onRegisterClick={() => setAuthOpen(true)}
-        isLoggedIn={isLoggedIn}
-        onDashboard={handleGoToDashboard}
-      />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              onRegisterClick={() => setAuthOpen(true)}
+              isLoggedIn={isLoggedIn}
+              onDashboard={handleGoToDashboard}
+            />
+          }
+        />
+        <Route path="/aboutUs" element={<AboutUs />} />
+        <Route path="/patientDashboard" element={<PatientDashboard />} />
+        <Route path="/doctorDashboard" element={<DoctorDashboard />} />
+      </Routes>
 
+      <Footer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
