@@ -1,6 +1,7 @@
 import { useState } from "react";
 import recovaidPng from "../assets/recovaidPng.png";
 import { X, Menu, User } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // Assuming you're using react-router for navigation
 
 export default function Navbar({
   onRegisterClick,
@@ -13,6 +14,16 @@ export default function Navbar({
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+  const navigate = useNavigate();
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
 
   return (
     <>
@@ -35,7 +46,19 @@ export default function Navbar({
             {["Home", "Features", "About Us", "FAQ"].map((item) => (
               <li key={item}>
                 <button
-                  className={`text-white hover:text-[#00C896] transition-colors duration-200`}
+                  className="text-white hover:text-[#00C896] transition-colors duration-200"
+                  onClick={() => {
+                    if (item === "Home") {
+                      navigate("/");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else if (item === "Features") {
+                      scrollToSection("features");
+                    } else if (item === "FAQ") {
+                      scrollToSection("faq");
+                    } else if (item === "About Us") {
+                      navigate("/aboutUs");
+                    }
+                  }}
                 >
                   {item}
                 </button>
@@ -115,7 +138,19 @@ export default function Navbar({
           {["Home", "Features", "About Us", "FAQ"].map((item) => (
             <button
               key={item}
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                if (item === "Home") {
+                  navigate("/");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                } else if (item === "Features") {
+                  scrollToSection("features");
+                } else if (item === "FAQ") {
+                  scrollToSection("faq");
+                } else if (item === "About Us") {
+                    navigate("/aboutUs");
+                }
+              }}
               className="text-white font-semibold text-lg text-left hover:text-[#00C896] transition"
             >
               {item}
