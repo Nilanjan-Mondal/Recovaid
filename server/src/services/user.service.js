@@ -79,6 +79,19 @@ async function fetchDoctors() {
   return doctors;
 }
 
+
+async function fetchUserById(userId) {
+  const user = await userRepo.findUserById(userId);
+  if (!user) {
+    throw {
+      message: "User not found",
+      statusCode: 404
+    };
+  }
+  return user;
+}
+
+
 module.exports = {
-  registerUser, fetchDoctors
+  registerUser, fetchDoctors, fetchUserById
 };

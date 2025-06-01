@@ -41,6 +41,66 @@ async function getAllDoctors(req, res) {
     }
   }
 
+
+async function getUser(req, res) {
+  const userId = req.params.id;
+  try {
+    const user = await userService.fetchUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+        data: {},
+        error: {}
+      });
+    }
+    return res.status(200).json({
+      message: "User fetched successfully",
+      success: true,
+      data: user,
+      error: {}
+    });
+  } catch (error) {
+    console.error("Error in getUser:", error);
+    return res.status(500).json({
+      message: "Failed to fetch user",
+      success: false,
+      data: {},
+      error
+    });
+  }
+}
+
+
+async function getUserOnLogin(req, res) {
+  const userId = req.user.id;
+  try {
+    const user = await userService.fetchUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+        data: {},
+        error: {}
+      });
+    }
+    return res.status(200).json({
+      message: "User fetched successfully",
+      success: true,
+      data: user,
+      error: {}
+    });
+  } catch (error) {
+    console.error("Error in getUserOnLogin:", error);
+    return res.status(500).json({
+      message: "Failed to fetch user",
+      success: false,
+      data: {},
+      error
+    });
+  }
+}
+
 module.exports = {
-  createUser, getAllDoctors
+  createUser, getAllDoctors, getUser, getUserOnLogin
 };
