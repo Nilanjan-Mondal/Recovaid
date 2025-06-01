@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true // Allow credentials (cookies, authorization headers, etc.)
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,9 +32,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/ping', isLoggedIn, (req, res) => {
-    // controller
-    console.log(req.body);
-    console.log(req.cookies);
     return res.json({message: "pong"});
 })
 
