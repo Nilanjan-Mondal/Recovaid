@@ -34,41 +34,61 @@ export default function Auth({ onClose, onLogin }) {
     fetchDoctors();
   }, [role]);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle post-login logic
+  const handlePostLogin = (UsrRole) => {
+
+    alert('Login successful!');
+    onClose();
+    onLogin(UsrRole);
+  };
+
+  // Submit (login or signup -> login)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isLogin
-      ? `${BaseUrl}/api/auth/login/`
-      : `${BaseUrl}/api/users/signup/`;
+
+    const payload = { ...formData, role };
 
     try {
-      const payload = {
-        ...formData,
-        role
-      };
+      if (isLogin) {
+        // LOGIN
+        const response = await axios.post(`${BaseUrl}/api/auth/login/`, {
+          email: formData.email,
+          password: formData.password,
+        }, { withCredentials: true });
 
-      const response = await axios.post(url, payload, {
-        withCredentials: true
-      });
+        handlePostLogin(response.data.data.role);
 
-      console.log("Response:", response.data);
-      alert('Success!');
-      onClose(); // close modal
-      onLogin(); // notify parent component about successful login
-    } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || error.message);
+      } else {
+        // SIGNUP
+        await axios.post(`${BaseUrl}/api/users/signup/`, payload, {
+          withCredentials: true,
+        });
+
+        // Auto-login after signup
+        const response = await axios.post(`${BaseUrl}/api/auth/login/`, {
+          email: formData.email,
+          password: formData.password,
+        }, { withCredentials: true });
+
+        handlePostLogin(response.data.data.role);
+      }
+
+    } catch (err) {
+      console.error("Auth error:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Authentication failed.");
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center px-4">
       <div className="bg-[#101a17] w-full max-w-md rounded-2xl shadow-xl p-8 relative text-white border border-[#00C89644]">
-        {/* Close */}
+        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
@@ -76,14 +96,10 @@ export default function Auth({ onClose, onLogin }) {
           <X size={22} />
         </button>
 
-        {!isLogin && (
-          <h2 className="text-2xl font-bold text-center mb-2">
-            {isLogin ? 'Login as' : 'Register as'}{' '}
-            <span className="text-[#00C896] capitalize">{role}</span>
-          </h2>
-        )}
-
-        {isLogin && <h2 className="text-2xl font-bold text-center mb-2"> Login </h2>}
+        <h2 className="text-2xl font-bold text-center mb-2">
+          {isLogin ? 'Login' : 'Register as'}{' '}
+          {!isLogin && <span className="text-[#00C896] capitalize">{role}</span>}
+        </h2>
 
         {/* Role Selector */}
         {!isLogin && (
@@ -112,6 +128,7 @@ export default function Auth({ onClose, onLogin }) {
         )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Only show extra fields on Register */}
           {!isLogin && (
             <>
               <input
@@ -120,7 +137,7 @@ export default function Auth({ onClose, onLogin }) {
                 placeholder="Name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
               />
               <input
                 type="text"
@@ -128,7 +145,7 @@ export default function Auth({ onClose, onLogin }) {
                 placeholder="Phone Number"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
               />
               {role === 'doctor' && (
                 <input
@@ -137,7 +154,7 @@ export default function Auth({ onClose, onLogin }) {
                   placeholder="Specialization"
                   value={formData.specialization}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                  className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
                 />
               )}
               {role === 'patient' && (
@@ -148,7 +165,7 @@ export default function Auth({ onClose, onLogin }) {
                     placeholder="Surgery Details"
                     value={formData.surgeryDetails}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
                   />
                   <input
                     type="text"
@@ -156,14 +173,13 @@ export default function Auth({ onClose, onLogin }) {
                     placeholder="Recovery Time (Days)"
                     value={formData.recoveryTimeDays}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
                   />
-
                   <select
                     name="assignedDoctor"
                     value={formData.assignedDoctor}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none appearance-none pr-8"
+                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] text-white appearance-none pr-8"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3csvg fill='white' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M7 7l3 3 3-3' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e")`,
                       backgroundRepeat: 'no-repeat',
@@ -178,27 +194,27 @@ export default function Auth({ onClose, onLogin }) {
                       </option>
                     ))}
                   </select>
-
                   <input
                     type="text"
                     name="startDate"
                     placeholder="Start Date (YYYY-MM-DD)"
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+                    className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
                   />
                 </>
               )}
             </>
           )}
 
+          {/* Common Email + Password */}
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+            className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
           />
           <input
             type="password"
@@ -206,7 +222,7 @@ export default function Auth({ onClose, onLogin }) {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white focus:outline-none"
+            className="w-full px-4 py-2 rounded-md bg-[#181e1c] border border-[#00C89644] placeholder-gray-400 text-white"
           />
 
           <button
