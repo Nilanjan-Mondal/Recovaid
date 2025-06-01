@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import {
   BrowserRouter as Router,
   Routes,
@@ -104,8 +105,31 @@ function MainApp() {
           }
         />
         <Route path="/aboutUs" element={<AboutUs />} />
-        <Route path="/patientDashboard" element={<PatientDashboard />} />
-        <Route path="/doctorDashboard" element={<DoctorDashboard />} />
+        {/* <Route path="/patientDashboard" element={<PatientDashboard />} />
+        <Route path="/doctorDashboard" element={<DoctorDashboard />} /> */}
+
+
+        <Route
+          path="/patientDashboard"
+          element={
+            isLoggedIn && role === "patient" ? (
+              <PatientDashboard />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+
+        <Route
+          path="/doctorDashboard"
+          element={
+            isLoggedIn && role === "doctor" ? (
+              <DoctorDashboard />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
       </Routes>
 
       <Footer />
