@@ -17,7 +17,8 @@ const dailyStatusSchema = new mongoose.Schema({
   aiSummary: { type: String },
   criticalityScore: { type: Number, default: 0 },
   doctorResponse: { type: String },
-  alertSent: { type: Boolean, default: false }
+  alertSent: { type: Boolean, default: false },
+  read: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('DailyStatus', dailyStatusSchema);
